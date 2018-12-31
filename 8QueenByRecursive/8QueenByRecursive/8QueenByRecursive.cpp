@@ -16,6 +16,8 @@ int pad [MAXQUEEN][MAXQUEEN] = {
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 
+int solution_count = 0;
+
 /*
  * 检查皇后是否有相互攻击
  */
@@ -106,6 +108,18 @@ int place(int x, int y)
 	return 1;
 }
 
+void print_pad(int *pad)
+{
+	for (int i = 0; i < MAXQUEEN; i++) {
+		for (int j = 0; j < MAXQUEEN; j++) {
+			printf("%d ", pad[i*MAXQUEEN+j]);
+		}
+		printf("\n");
+	}
+
+	printf("\n");
+}
+
 /*
  * 放N 个皇后的递归函数
  */
@@ -142,16 +156,31 @@ int put_queen(int x, int y, int times)
 	}
 }
 
-void print_pad(int *pad)
+/*
+ * 在每一行上放置皇后
+ * 然后在下一行的所有位置放置皇后
+ */
+int put_queen_row(int row, int col, int qcount)
 {
-	for (int i = 0; i < MAXQUEEN; i++) {
-		for (int j = 0; j < MAXQUEEN; j++) {
-			printf("%d ", pad[i*MAXQUEEN+j]);
+	if (place(row, col) ) {
+		pad[row][col] = 1;
+		if (qcount >= MAXQUEEN) {
+			printf("solution No.%d\n", ++solution_count);
+			print_pad(&pad[0][0]);
+			pad[row][col] =0;
+			return 0;
 		}
-		printf("\n");
+
+		for (int j = 0; j < MAXQUEEN; j++) {
+			int result = put_queen_row(row+1, j, qcount+1);
+			pad[row+1][j] = 0;
+		}
+	}
+	else {
+		return 0;
 	}
 
-	printf("\n");
+	return 0;
 }
 
 /*
@@ -159,11 +188,16 @@ void print_pad(int *pad)
  */
 int _tmain(int argc, _TCHAR* argv[])
 {
-	int i, j;
+	// 1 solution
+	// put_queen(0, 0, 1);
+	// print_pad(&pad[0][0]);
 
-	put_queen(0, 0, 1);
-
-	print_pad(&pad[0][0]);
+	// all 92 solutions
+	int j;
+	for (j = 0; j < MAXQUEEN; j++) {
+		put_queen_row(0, j, 1);
+		pad[0][j] = 0;
+	}
 
 	return 0;
 }
